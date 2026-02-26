@@ -18,6 +18,23 @@ const Products = () => {
   }, []);
 
   useEffect(() => {
+    const filterProducts = () => {
+      let filtered = products;
+
+      if (selectedCategory !== 'All') {
+        filtered = filtered.filter(p => p.category === selectedCategory);
+      }
+
+      if (searchTerm) {
+        filtered = filtered.filter(p =>
+          p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          p.description.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }
+
+      setFilteredProducts(filtered);
+    };
+    
     filterProducts();
   }, [searchTerm, selectedCategory, products]);
 
@@ -31,23 +48,6 @@ const Products = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const filterProducts = () => {
-    let filtered = products;
-
-    if (selectedCategory !== 'All') {
-      filtered = filtered.filter(p => p.category === selectedCategory);
-    }
-
-    if (searchTerm) {
-      filtered = filtered.filter(p =>
-        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    setFilteredProducts(filtered);
   };
 
   const categories = ['All', ...new Set(products.map(p => p.category))];

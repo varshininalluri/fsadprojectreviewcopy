@@ -14,19 +14,19 @@ const ProductDetails = () => {
   const { user } = useAuth();
 
   useEffect(() => {
+    const loadProduct = async () => {
+      try {
+        const data = await productService.getById(id);
+        setProduct(data);
+      } catch (error) {
+        console.error('Failed to load product');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
     loadProduct();
   }, [id]);
-
-  const loadProduct = async () => {
-    try {
-      const data = await productService.getById(id);
-      setProduct(data);
-    } catch (error) {
-      console.error('Failed to load product');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleAddToCart = () => {
     for (let i = 0; i < quantity; i++) {

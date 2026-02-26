@@ -152,9 +152,9 @@ const Contact = () => {
             <div className="bg-white rounded-lg shadow-lg p-8">
               <h3 className="text-xl font-bold text-gray-900 mb-4">Follow Us</h3>
               <div className="flex space-x-4">
-                <a href="#" className="text-primary hover:text-secondary transition">Facebook</a>
-                <a href="#" className="text-primary hover:text-secondary transition">Instagram</a>
-                <a href="#" className="text-primary hover:text-secondary transition">Twitter</a>
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-secondary transition">Facebook</a>
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-secondary transition">Instagram</a>
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-secondary transition">Twitter</a>
               </div>
             </div>
           </div>

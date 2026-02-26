@@ -1,13 +1,3 @@
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-
-const getAuthHeaders = () => {
-  const token = localStorage.getItem('token');
-  return {
-    'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` })
-  };
-};
-
 export const authService = {
   login: async (email, password) => {
     const mockToken = 'mock-jwt-token-' + Date.now();
