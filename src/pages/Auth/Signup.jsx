@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { authService } from '../../services/api';
+import { authService } from '../../services/apiService';
 import { validateEmail, validatePassword, validatePhone } from '../../utils/validation';
 
 const Signup = () => {
@@ -9,6 +9,7 @@ const Signup = () => {
     name: '',
     email: '',
     phone: '',
+    address: '',
     password: '',
     confirmPassword: '',
     role: 'buyer'
@@ -25,34 +26,28 @@ const Signup = () => {
 
   const validate = () => {
     const newErrors = {};
-    
+
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required';
     }
-    
+
     if (!formData.email) {
       newErrors.email = 'Email is required';
     } else if (!validateEmail(formData.email)) {
       newErrors.email = 'Invalid email format';
     }
-    
-    if (!formData.phone) {
-      newErrors.phone = 'Phone number is required';
-    } else if (!validatePhone(formData.phone)) {
-      newErrors.phone = 'Phone number must be 10 digits';
-    }
-    
+
     const passwordValidation = validatePassword(formData.password);
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (!passwordValidation.isValid) {
       newErrors.password = 'Password must meet all requirements';
     }
-    
+
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
-    
+
     return newErrors;
   };
 
@@ -66,9 +61,20 @@ const Signup = () => {
 
     setLoading(true);
     try {
-      const { user, token } = await authService.signup(formData);
+      // Send all required fields to backend
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: formData.role,  // already lowercase: buyer / artisan / admin
+        phone: formData.phone || null,
+        address: formData.address || null
+      };
+
+      // Backend returns { token, user: { id, name, email, role } }
+      const { token, user } = await authService.signup(payload);
       login(user, token);
-      
+
       switch (user.role) {
         case 'admin':
           navigate('/admin/dashboard');
@@ -83,7 +89,14 @@ const Signup = () => {
           navigate('/');
       }
     } catch (error) {
-      setErrors({ submit: 'Registration failed. Please try again.' });
+      // Show real backend error message if available
+      const msg =
+        error?.response?.data?.message ||
+        error?.response?.data?.email ||
+        error?.response?.data?.role ||
+        (error?.code === 'ERR_NETWORK' ? 'Cannot connect to server. Please ensure the backend is running on port 8080.' :
+        'Registration failed. Please try again.');
+      setErrors({ submit: msg });
     } finally {
       setLoading(false);
     }
@@ -129,7 +142,7 @@ const Signup = () => {
           </div>
 
           <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone Number</label>
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone Number (Optional)</label>
             <input
               id="phone"
               name="phone"
@@ -140,6 +153,20 @@ const Signup = () => {
               placeholder="10-digit phone number"
             />
             {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
+          </div>
+
+          <div>
+            <label htmlFor="address" className="block text-sm font-medium text-gray-700">Address (Optional)</label>
+            <textarea
+              id="address"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              rows="3"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+              placeholder="Your address"
+            />
+            {errors.address && <p className="mt-1 text-sm text-red-600">{errors.address}</p>}
           </div>
 
           <div>
@@ -169,7 +196,7 @@ const Signup = () => {
               placeholder="Create a strong password"
             />
             {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
-            
+
             {formData.password && (
               <div className="mt-2 space-y-1">
                 <p className={`text-xs ${passwordValidation.errors.minLength ? 'text-green-600' : 'text-red-600'}`}>

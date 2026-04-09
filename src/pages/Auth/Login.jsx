@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { authService } from '../../services/api';
+import { authService } from '../../services/apiService';
 import { validateEmail } from '../../utils/validation';
 
 const Login = () => {
@@ -39,9 +39,10 @@ const Login = () => {
 
     setLoading(true);
     try {
-      const { user, token } = await authService.login(formData.email, formData.password);
+      // Backend returns { token, user: { id, name, email, role } }
+      const { token, user } = await authService.login(formData.email, formData.password);
       login(user, token);
-      
+
       switch (user.role) {
         case 'admin':
           navigate('/admin/dashboard');
@@ -56,7 +57,11 @@ const Login = () => {
           navigate('/');
       }
     } catch (error) {
-      setErrors({ submit: 'Invalid credentials. Please try again.' });
+      const msg =
+        error?.response?.data?.message ||
+        (error?.code === 'ERR_NETWORK' ? 'Cannot connect to server. Please ensure the backend is running on port 8080.' :
+        'Invalid credentials. Please try again.');
+      setErrors({ submit: msg });
     } finally {
       setLoading(false);
     }

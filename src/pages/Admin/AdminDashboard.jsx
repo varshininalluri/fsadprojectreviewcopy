@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { productService, orderService } from '../../services/api';
+import { productService, orderService } from '../../services/apiService';
 
 const AdminDashboard = () => {
   const { user } = useAuth();

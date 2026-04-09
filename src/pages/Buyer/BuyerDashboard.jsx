@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { orderService } from '../../services/api';
+import { orderService } from '../../services/apiService';
 
 const BuyerDashboard = () => {
   const { user } = useAuth();

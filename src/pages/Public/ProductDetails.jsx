@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { productService } from '../../services/api';
+import { productService } from '../../services/apiService';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 
@@ -19,7 +19,7 @@ const ProductDetails = () => {
         const data = await productService.getById(id);
         setProduct(data);
       } catch (error) {
-        console.error('Failed to load product');
+        console.error('Failed to load product:', error?.response?.data || error.message);
       } finally {
         setLoading(false);
       }
@@ -66,19 +66,20 @@ const ProductDetails = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
             <div>
               <img
-                src={product.image}
+                src={product.image || product.imageUrl || 'https://placehold.co/400x300?text=Product'}
                 alt={product.name}
                 className="w-full h-96 object-cover rounded-lg"
+                onError={(e) => { e.target.src = 'https://placehold.co/400x300?text=Product'; }}
               />
             </div>
 
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-4">{product.name}</h1>
-              <p className="text-gray-600 mb-2">by {product.artisan}</p>
+              <p className="text-gray-600 mb-2">by {product.artisanName}</p>
               <p className="text-sm text-gray-500 mb-4">Category: {product.category}</p>
               
               <div className="mb-6">
-                <span className="text-4xl font-bold text-primary">₹{product.price.toLocaleString()}</span>
+                <span className="text-4xl font-bold text-primary">₹{Number(product.price ?? 0).toLocaleString()}</span>
               </div>
 
               <p className="text-gray-700 mb-6">{product.description}</p>

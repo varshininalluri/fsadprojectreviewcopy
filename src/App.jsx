@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ProtectedRoute from './routes/ProtectedRoute';
+
+// ✅ IMPORT API
+import API from './services/api';
 
 import Login from './pages/Auth/Login';
 import Signup from './pages/Auth/Signup';
@@ -20,6 +23,18 @@ import ArtisanDashboard from './pages/Artisan/ArtisanDashboard';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 
 function App() {
+
+  // ✅ BACKEND CONNECTION TEST
+  useEffect(() => {
+    API.get("/")
+      .then((res) => {
+        console.log("✅ Backend Connected:", res.data);
+      })
+      .catch((err) => {
+        console.error("❌ Backend Error:", err);
+      });
+  }, []);
+
   return (
     <Router>
       <AuthProvider>
